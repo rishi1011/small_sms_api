@@ -5,11 +5,11 @@ from typing import (
     Optional,
 )
 from pydantic import (
-    BaseSettings,
     PostgresDsn,
     validator
 )
 
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "FastAPI School Management System"
@@ -30,10 +30,10 @@ class Settings(BaseSettings):
             return v
         return PostgresDsn.build(
             scheme="postgresql",
-            user=values.get("DB_USER"),
+            username=values.get("DB_USER"),
             password=values.get("DB_PASSWORD"),
             host=values.get("DB_HOST"),
-            path=f"/{values.get('DB_NAME') or  ''}",
+            path=values.get('DB_NAME') or  '',
         )
 
     class Config:
