@@ -84,10 +84,10 @@ def update_nationality(
     if not nationality:
         raise HTTPException(status_code=404, detail="Nationality not found")
 
-    nationality = crud.nationality.get_by_name(
+    existing_nationality = crud.nationality.get_by_name(
         db, nationality_in.masculine_form, nationality_in.feminine_form
     )
-    if nationality and nationality.id != nationality_id:
+    if existing_nationality and existing_nationality.id != nationality_id:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Redundant data."
