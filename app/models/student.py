@@ -1,14 +1,21 @@
+import enum
+
 from sqlalchemy import (
     Column,
     ForeignKey,
     String,
     Date,
     Boolean,
+    Enum
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import BigInteger
 from app.db.base_class import Base
 
+class GenderEnum(str, enum.Enum):
+    male = "male"
+    female = "female"
+    other = "other"
 
 class Student(Base):
     id = Column(BigInteger, primary_key=True)
@@ -16,7 +23,7 @@ class Student(Base):
     father_name = Column(String, nullable=False)
     gfather_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    gender = Column(Boolean, default=True, nullable=False)
+    gender = Column(GenderEnum, nullable=False)
     date_of_birth = Column(Date, nullable=False)
     guardian_phone_no = Column(String, nullable=False)
     nationality_id = Column(ForeignKey('nationalities.id'), nullable=False)

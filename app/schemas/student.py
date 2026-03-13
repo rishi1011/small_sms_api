@@ -5,6 +5,7 @@ from pydantic import (
     BaseModel,
     validator
 )
+from app.models.student import GenderEnum
 from app.schemas.nationality import NationalityInDB
 
 
@@ -13,7 +14,7 @@ class Base(BaseModel):
     father_name: str
     gfather_name: str
     last_name: str
-    gender: bool
+    gender: GenderEnum
     date_of_birth: date
     guardian_phone_no: str
 
