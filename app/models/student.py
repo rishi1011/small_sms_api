@@ -23,7 +23,7 @@ class Student(Base):
     father_name = Column(String, nullable=False)
     gfather_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    gender = Column(GenderEnum, nullable=False)
+    gender = Column(Enum(GenderEnum), nullable=False)
     date_of_birth = Column(Date, nullable=False)
     guardian_phone_no = Column(String, nullable=False)
     nationality_id = Column(ForeignKey('nationalities.id'), nullable=False)

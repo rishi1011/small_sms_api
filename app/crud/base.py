@@ -13,9 +13,9 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.db.base import Base
 
-ModelType = TypeVar('ModelType', bound=Base)
-CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
-UpdateSchemaType = TypeVar('UpdateSchemaType', bound=BaseModel)
+ModelType = TypeVar("ModelType", bound=Base)
+CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
+UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -23,7 +23,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 20, params: Dict[str, Any] = None
+        self,
+        db: Session,
+        *,
+        skip: int = 0,
+        limit: int = 20,
+        params: Dict[str, Any] = None
     ) -> List[ModelType]:
         query = db.query(self.model)
         if params:

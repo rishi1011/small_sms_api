@@ -4,17 +4,15 @@ from typing import (
     Dict,
     Optional,
 )
-from pydantic import (
-    PostgresDsn,
-    validator
-)
+from pydantic import PostgresDsn, field_validator, ConfigDict, ValidationInfo
 
 from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "FastAPI School Management System"
     API_V1_STR: str = "/api/v1"
-    
+
     DB_HOST: str
     DB_USER: str
     DB_PASSWORD: str
@@ -22,23 +20,24 @@ class Settings(BaseSettings):
 
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(
-        cls, v: Optional[str], values: Dict[str, Any]
-    ) -> Any:
+    model_config = ConfigDict(case_sensitive=True, env_file = ".env")
+
+    @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
+    @classmethod
+    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v
         return PostgresDsn.build(
             scheme="postgresql",
-            username=values.get("DB_USER"),
-            password=values.get("DB_PASSWORD"),
-            host=values.get("DB_HOST"),
-            path=values.get('DB_NAME') or  '',
+            username=info.data.get("DB_USER"),
+            password=info.data.get("DB_PASSWORD"),
+            host=info.data.get("DB_HOST"),
+            path=info.data.get("DB_NAME") or "",
         )
 
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
+    # class Config:
+    #     case_sensitive = True
+    #     env_file = ".env"
 
 
 @lru_cache

@@ -79,4 +79,4 @@ class StudentInDB(Base):
     nationality: NationalityInDB
 
     class Config:
-        orm_mode = True
+        from_attributes = True
