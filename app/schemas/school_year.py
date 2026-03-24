@@ -2,7 +2,9 @@ from datetime import date
 from datetime import datetime
 from pydantic import (
     BaseModel,
-    validator
+    ValidationInfo,
+    field_validator,
+    ConfigDict,
 )
 
 
@@ -11,35 +13,23 @@ class Base(BaseModel):
     start_date: date
     end_date: date
 
-    @validator("title")
+    @field_validator("title")
     def validate_title(cls, value):
         if not value:
             raise ValueError('Title must not be empty.')
         return value
 
-    @validator("start_date", pre=True)
-    def parse_start_date(cls, value):
-        if isinstance(value, date):
-            return value
-        return datetime.strptime(
-            value,
-            "%Y-%m-%d"
-        ).date()
-
-    @validator("end_date", pre=True)
-    def parse_end_date(cls, value):
-        if isinstance(value, date):
-            return value
-        return datetime.strptime(
-            value,
-            "%Y-%m-%d"
-        ).date()
-
-    @validator("end_date")
-    def validate_start_and_end_date(cls, v, values):
-        if values['start_date'] >= v:
-            raise ValueError('End date is bigger than or equal to start date.')
+    @field_validator("end_date")
+    def validate_start_and_end_date(cls, v, info: ValidationInfo):
+        if info.data['start_date'] >= v:
+            raise ValueError('End date must be after start date.')
         return v
+    
+    @field_validator("start_date", "end_date", mode="before")
+    def parse_date(cls, value):
+        if isinstance(value, date):
+            return value
+        return datetime.strptime(value, "%Y-%m-%d").date()
 
 
 class SchoolYearCreate(Base):
@@ -54,5 +44,4 @@ class SchoolYearInDB(Base):
     id: int
     is_active: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
