@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class SubjectBase(BaseModel):
     name: str
@@ -12,5 +12,4 @@ class SubjectUpdate(SubjectBase):
 class SubjectInDB(SubjectBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

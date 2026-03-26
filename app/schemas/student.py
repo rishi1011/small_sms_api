@@ -3,6 +3,7 @@ from datetime import date
 from datetime import datetime
 from pydantic import (
     BaseModel,
+    ConfigDict,
     field_validator
 )
 from app.models.student import GenderEnum
@@ -78,5 +79,4 @@ class StudentInDB(Base):
     id: int
     nationality: NationalityInDB
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
