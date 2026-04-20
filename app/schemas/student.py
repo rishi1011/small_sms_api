@@ -1,11 +1,7 @@
 import re
 from datetime import date
 from datetime import datetime
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    field_validator
-)
+from pydantic import BaseModel, ConfigDict, field_validator
 from app.models.student import GenderEnum
 from app.schemas.nationality import NationalityInDB
 
@@ -23,46 +19,43 @@ class Base(BaseModel):
     def validate_first_name(cls, value: str):
         value = value.strip()
         if not value:
-            raise ValueError('First name must not be empty.')
+            raise ValueError("First name must not be empty.")
         return value
 
     @field_validator("father_name")
     def validate_father_name(cls, value: str):
         value = value.strip()
         if not value:
-            raise ValueError('Father name must not be empty.')
+            raise ValueError("Father name must not be empty.")
         return value
 
     @field_validator("gfather_name")
     def validate_gfather_name(cls, value: str):
         value = value.strip()
         if not value:
-            raise ValueError('Grand Father name must not be empty.')
+            raise ValueError("Grand Father name must not be empty.")
         return value
 
     @field_validator("last_name")
     def validate_last_name(cls, value: str):
         value = value.strip()
         if not value:
-            raise ValueError('Last name must not be empty.')
+            raise ValueError("Last name must not be empty.")
         return value
 
-    @field_validator("date_of_birth", pre=True)
+    @field_validator("date_of_birth", mode="before")
     def parse_date_of_birth(cls, value):
         if isinstance(value, date):
             return value
-        return datetime.strptime(
-            value,
-            "%Y-%m-%d"
-        ).date()
+        return datetime.strptime(value, "%Y-%m-%d").date()
 
     @field_validator("guardian_phone_no")
     def validate_guardian_phone_no(cls, value: str):
         value = value.strip()
         if not value:
-            raise ValueError('Guardian phone number must not be empty.')
-        if not re.match(r'^\d{9}$', value):
-            raise ValueError('Please Enter a valid phone number.')
+            raise ValueError("Guardian phone number must not be empty.")
+        if not re.match(r"^\d{9}$", value):
+            raise ValueError("Please Enter a valid phone number.")
 
         return value
 
