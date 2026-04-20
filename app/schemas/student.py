@@ -1,9 +1,12 @@
 import re
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime
+
 from pydantic import BaseModel, ConfigDict, field_validator
+
 from app.models.student import GenderEnum
 from app.schemas.nationality import NationalityInDB
+
+PHONE_PATTERN = re.compile(r"^\d{9}$")
 
 
 class Base(BaseModel):
@@ -15,33 +18,22 @@ class Base(BaseModel):
     date_of_birth: date
     guardian_phone_no: str
 
-    @field_validator("first_name")
-    def validate_first_name(cls, value: str):
+    @classmethod
+    def _validate_required_text(cls, value: str, label: str) -> str:
         value = value.strip()
         if not value:
-            raise ValueError("First name must not be empty.")
+            raise ValueError(f"{label} must not be empty.")
         return value
 
-    @field_validator("father_name")
-    def validate_father_name(cls, value: str):
-        value = value.strip()
-        if not value:
-            raise ValueError("Father name must not be empty.")
-        return value
-
-    @field_validator("gfather_name")
-    def validate_gfather_name(cls, value: str):
-        value = value.strip()
-        if not value:
-            raise ValueError("Grand Father name must not be empty.")
-        return value
-
-    @field_validator("last_name")
-    def validate_last_name(cls, value: str):
-        value = value.strip()
-        if not value:
-            raise ValueError("Last name must not be empty.")
-        return value
+    @field_validator("first_name", "father_name", "gfather_name", "last_name")
+    def validate_names(cls, value: str, info):
+        labels = {
+            "first_name": "First name",
+            "father_name": "Father name",
+            "gfather_name": "Grand Father name",
+            "last_name": "Last name",
+        }
+        return cls._validate_required_text(value, labels[info.field_name])
 
     @field_validator("date_of_birth", mode="before")
     def parse_date_of_birth(cls, value):
@@ -51,10 +43,8 @@ class Base(BaseModel):
 
     @field_validator("guardian_phone_no")
     def validate_guardian_phone_no(cls, value: str):
-        value = value.strip()
-        if not value:
-            raise ValueError("Guardian phone number must not be empty.")
-        if not re.match(r"^\d{9}$", value):
+        value = cls._validate_required_text(value, "Guardian phone number")
+        if not PHONE_PATTERN.match(value):
             raise ValueError("Please Enter a valid phone number.")
 
         return value

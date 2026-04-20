@@ -1,10 +1,7 @@
 from functools import lru_cache
-from typing import (
-    Any,
-    Dict,
-    Optional,
-)
-from pydantic import PostgresDsn, field_validator, ConfigDict, ValidationInfo
+from typing import Any, Optional
+
+from pydantic import ConfigDict, PostgresDsn, ValidationInfo, field_validator
 
 from pydantic_settings import BaseSettings
 
@@ -22,33 +19,26 @@ class Settings(BaseSettings):
     TEST_DB_URI: Optional[PostgresDsn] = None
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
-    model_config = ConfigDict(case_sensitive=True, env_file = ".env")
+    model_config = ConfigDict(case_sensitive=True, env_file=".env")
 
-    @field_validator("TEST_DB_URI", mode="before")
     @classmethod
-    def assemble_test_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
-        if isinstance(v, str):
-            return v
+    def _build_postgres_dsn(cls, db_name: Optional[str], info: ValidationInfo) -> PostgresDsn:
         return PostgresDsn.build(
             scheme="postgresql",
             username=info.data.get("DB_USER"),
             password=info.data.get("DB_PASSWORD"),
             host=info.data.get("DB_HOST"),
-            path=info.data.get("TEST_DB_NAME") or "",
+            path=db_name or "",
         )
 
-    @field_validator("SQLALCHEMY_DATABASE_URI", mode="before")
+    @field_validator("TEST_DB_URI", "SQLALCHEMY_DATABASE_URI", mode="before")
     @classmethod
     def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            username=info.data.get("DB_USER"),
-            password=info.data.get("DB_PASSWORD"),
-            host=info.data.get("DB_HOST"),
-            path=info.data.get("DB_NAME") or "",
-        )
+
+        db_name_field = "TEST_DB_NAME" if info.field_name == "TEST_DB_URI" else "DB_NAME"
+        return cls._build_postgres_dsn(info.data.get(db_name_field), info)
 
 
 @lru_cache
