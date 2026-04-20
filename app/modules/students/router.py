@@ -10,13 +10,17 @@ from app.modules.students.schemas import StudentCreate, StudentInDB, StudentUpda
 from app.modules.students.service import StudentService
 
 router = APIRouter(prefix="/students", tags=["Students"])
-service = StudentService()
+
+
+def get_student_service() -> StudentService:
+    return StudentService()
 
 
 @router.get("", response_model=List[StudentInDB])
 def get_students(
     *,
     db: Session = Depends(get_db),
+    service: StudentService = Depends(get_student_service),
     commons: CommonQueryParams = Depends(),
 ):
     return service.get_students(db, skip=commons.skip, limit=commons.limit)
@@ -26,6 +30,7 @@ def get_students(
 def get_student(
     *,
     db: Session = Depends(get_db),
+    service: StudentService = Depends(get_student_service),
     student_id: int,
 ):
     return service.get_student(db, student_id=student_id)
@@ -35,6 +40,7 @@ def get_student(
 def create_student(
     *,
     db: Session = Depends(get_db),
+    service: StudentService = Depends(get_student_service),
     student_in: StudentCreate,
 ):
     return service.create_student(db, student_in=student_in)
@@ -44,6 +50,7 @@ def create_student(
 def update_student(
     *,
     db: Session = Depends(get_db),
+    service: StudentService = Depends(get_student_service),
     student_id: int,
     student_in: StudentUpdate,
 ):
@@ -54,6 +61,7 @@ def update_student(
 def delete_student(
     *,
     db: Session = Depends(get_db),
+    service: StudentService = Depends(get_student_service),
     student_id: int,
 ):
     service.delete_student(db, student_id=student_id)

@@ -14,13 +14,17 @@ from app.modules.nationalities.schemas import (
 from app.modules.nationalities.service import NationalityService
 
 router = APIRouter(prefix="/nationalities", tags=["Nationalities"])
-service = NationalityService()
+
+
+def get_nationality_service() -> NationalityService:
+    return NationalityService()
 
 
 @router.get("", response_model=List[NationalityInDB])
 def get_nationalities(
     *,
     db: Session = Depends(deps.get_db),
+    service: NationalityService = Depends(get_nationality_service),
     commons: deps.CommonQueryParams = Depends(),
 ):
     return service.get_nationalities(db, skip=commons.skip, limit=commons.limit)
@@ -30,6 +34,7 @@ def get_nationalities(
 def get_nationality(
     *,
     db: Session = Depends(deps.get_db),
+    service: NationalityService = Depends(get_nationality_service),
     nationality_id: int,
 ):
     return service.get_nationality(db, nationality_id=nationality_id)
@@ -39,6 +44,7 @@ def get_nationality(
 def create_nationality(
     *,
     db: Session = Depends(deps.get_db),
+    service: NationalityService = Depends(get_nationality_service),
     nationality_in: NationalityCreate,
 ):
     return service.create_nationality(db, nationality_in=nationality_in)
@@ -48,6 +54,7 @@ def create_nationality(
 def update_nationality(
     *,
     db: Session = Depends(deps.get_db),
+    service: NationalityService = Depends(get_nationality_service),
     nationality_id: int,
     nationality_in: NationalityUpdate,
 ):
@@ -60,6 +67,7 @@ def update_nationality(
 def delete_nationality(
     *,
     db: Session = Depends(deps.get_db),
+    service: NationalityService = Depends(get_nationality_service),
     nationality_id: int,
 ):
     service.delete_nationality(db, nationality_id=nationality_id)

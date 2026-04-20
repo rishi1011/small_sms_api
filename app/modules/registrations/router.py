@@ -10,13 +10,17 @@ from app.modules.registrations.schemas import RegistrationIn, RegistrationOut
 from app.modules.registrations.service import RegistrationService
 
 router = APIRouter(prefix="/registrations", tags=["Registrations"])
-service = RegistrationService()
+
+
+def get_registration_service() -> RegistrationService:
+    return RegistrationService()
 
 
 @router.get("", response_model=List[RegistrationOut])
 def get_registrations(
     *,
     db: Session = Depends(get_db),
+    service: RegistrationService = Depends(get_registration_service),
     commons: CommonQueryParams = Depends(),
     school_year_id: Optional[int] = None,
     grade_id: Optional[int] = None,
@@ -33,10 +37,20 @@ def get_registrations(
 
 
 @router.get("/{registration_id}", response_model=RegistrationOut)
-def get_registration(*, db: Session = Depends(get_db), registration_id: int):
+def get_registration(
+    *,
+    db: Session = Depends(get_db),
+    service: RegistrationService = Depends(get_registration_service),
+    registration_id: int,
+):
     return service.get_registration(db, registration_id=registration_id)
 
 
 @router.post("", response_model=RegistrationOut, status_code=status.HTTP_201_CREATED)
-def create_registration(*, db: Session = Depends(get_db), registration_in: RegistrationIn):
+def create_registration(
+    *,
+    db: Session = Depends(get_db),
+    service: RegistrationService = Depends(get_registration_service),
+    registration_in: RegistrationIn,
+):
     return service.create_registration(db, registration_in=registration_in)
