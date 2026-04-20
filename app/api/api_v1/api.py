@@ -1,18 +1,19 @@
 from fastapi import APIRouter
-from app.api.api_v1.routes import (
-    grade,
-    registration,
-    subject,
-    school_year,
-    student,
-    nationality,
-)
+from app.modules.grades.router import router as grades_router
+from app.modules.nationalities.router import router as nationalities_router
+from app.modules.registrations.router import router as registrations_router
+from app.modules.school_years.router import router as school_years_router
+from app.modules.students.router import router as students_router
+from app.modules.subjects.router import router as subjects_router
 
 api_router = APIRouter()
 
-api_router.include_router(grade.router)
-api_router.include_router(subject.router)
-api_router.include_router(school_year.router)
-api_router.include_router(student.router)
-api_router.include_router(registration.router)
-api_router.include_router(nationality.router)
+for router in (
+    grades_router,
+    subjects_router,
+    school_years_router,
+    students_router,
+    registrations_router,
+    nationalities_router,
+):
+    api_router.include_router(router)
